@@ -4,7 +4,8 @@ from typing import Tuple
 
 from langchain_core.tools import tool
 
-PROJECT_ROOT = pathlib.Path.cwd() / "generated_project"
+# Use absolute path relative to this file's location
+PROJECT_ROOT = pathlib.Path(__file__).parent / "generated_project"
 
 
 def safe_path_for_project(path: str) -> pathlib.Path:
@@ -16,23 +17,12 @@ def safe_path_for_project(path: str) -> pathlib.Path:
 
 @tool
 def write_file(path: str, content: str) -> str:
-    """Writes content to a file at the specified path within the project root.
-    
-    Args:
-        path: The file path relative to project root
-        content: The content to write to the file
-    
-    Returns:
-        Success message with the written file path
-    """
-    try:
-        p = safe_path_for_project(path)
-        p.parent.mkdir(parents=True, exist_ok=True)
-        with open(p, "w", encoding="utf-8") as f:
-            f.write(content)
-        return f"Successfully wrote content to: {p}"
-    except Exception as e:
-        return f"Error writing file {path}: {str(e)}"
+    """Writes content to a file at the specified path within the project root."""
+    p = safe_path_for_project(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with open(p, "w", encoding="utf-8") as f:
+        f.write(content)
+    return f"WROTE:{p}"
 
 
 @tool

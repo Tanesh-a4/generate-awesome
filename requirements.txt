@@ -6,4 +6,5 @@ langgraph>=0.6.3
 pydantic>=2.11.7
 python-dotenv>=1.1.1
 flask>=3.0.0
+flask-cors>=4.0.0
 gunicorn>=21.2.0

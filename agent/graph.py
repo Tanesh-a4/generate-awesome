@@ -4,7 +4,9 @@ from dotenv import load_dotenv
 from langchain.globals import set_verbose,set_debug
 from langchain_groq import ChatGroq
 from langgraph.prebuilt import create_react_agent
-
+from langchain_google_genai import ChatGoogleGenerativeAI
+import os
+import time
 from agent.states import *
 from agent.prompts import *
 from agent.tools import *
@@ -15,21 +17,41 @@ from langgraph.graph import StateGraph
 _ = load_dotenv()
 set_debug(True)
 set_verbose(True)
+last_request_time = 0
+REQUEST_INTERVAL = 6 
+
 llm = ChatGroq(model="openai/gpt-oss-120b")
 
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",  # or "gemini-1.5-flash" for faster responses
+    google_api_key=os.getenv("GEMINI_API_KEY")
+)
 
-
+def safe_invoke(func, *args, **kwargs):
+    global last_request_time
+    elapsed = time.time() - last_request_time
+    if elapsed < REQUEST_INTERVAL:
+        time.sleep(REQUEST_INTERVAL - elapsed)
+    result = func(*args, **kwargs)
+    last_request_time = time.time()
+    return result
 
 def planner_agent(state : dict) -> dict :
     user_prompt = state["user_prompt"]
-    resp=llm.with_structured_output(Plan).invoke(planner_prompt(user_prompt))
+    resp = safe_invoke(
+        llm.with_structured_output(Plan).invoke,
+        planner_prompt(user_prompt)
+    )
     if resp is None:
         raise ValueError("Planner did not return a valid response.")
     return { "plan" :resp }
 
 def architect_agent(state : dict) -> dict :
     plan = state["plan"]
-    resp = llm.with_structured_output(TaskPlan).invoke(architect_prompt(plan))
+    resp =  safe_invoke(
+        llm.with_structured_output(TaskPlan).invoke,
+        architect_prompt(plan)
+        )
     if resp is None:
         raise Exception("Architect did not return a response.")
     resp.plan = plan
@@ -54,26 +76,24 @@ def coder_agent(state : dict) -> dict :
         f"Task : {current_task.task_description} \n"
         f"File : {current_task.filepath} \n"
         f"Existing content : \n {existing_content}\n"
-        "Use write_file(path,content) to save your changes. "
-        "IMPORTANT: When generating CSS or JS content with quotes, escape them properly in JSON. "
-        "Use simple content without complex formatting for better tool call success."
+        "Use write_file(path,content) to save your changes"
     )
 
+    # resp = llm.invoke(system_prompt + user_prompt)
+
+
     coder_tools = [read_file,write_file,list_files,get_current_directory]
-    
-    try:
-        react_agent = create_react_agent(llm,coder_tools)
-        react_agent.invoke({
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ]
-        })
-    except Exception as e:
-        print(f"Error in coder agent for task {current_task.filepath}: {e}")
-        # Continue to next task even if current one fails
-        pass
-    
+    react_agent = create_react_agent(llm,coder_tools)
+    safe_invoke(
+    react_agent.invoke,
+    {
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+    }
+)
+
     coder_state.current_step_idx += 1
     return {"coder_state" :coder_state}
 

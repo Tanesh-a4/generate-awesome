@@ -9,3 +9,9 @@ wheels/
 # Virtual environments
 .venv
 
+#md files
+
+IMPLEMENTATION_SUMMARY.md
+TROUBLESHOOTING.md
+VISUAL_GUIDE.md
+QUICK_REFERENCE.md
