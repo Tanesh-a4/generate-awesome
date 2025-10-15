@@ -7,7 +7,6 @@ import {
   Folder, 
   Save, 
   Download, 
-  Trash2, 
   Eye,
   Loader2,
   ChevronRight,
@@ -15,12 +14,26 @@ import {
 } from 'lucide-react';
 import './ProjectViewer.css';
 
+// ✅ Environment-aware base URLs
+const isLocalhost = window.location.hostname.includes('localhost');
+
+// Priority:
+// 1️⃣ Environment variables (from .env)
+// 2️⃣ Auto-detect: localhost → dev, else → production
+const baseURL =
+  process.env.REACT_APP_API_BASE_URL ||
+  (isLocalhost
+    ? 'http://localhost:5000'
+    : 'https://generate-awesome-backend.onrender.com');
+
+const API_BASE_URL = `${baseURL}/api`;
+const PREVIEW_BASE_URL =
+  process.env.REACT_APP_PREVIEW_BASE_URL || `${baseURL}/preview`;
+
 interface ProjectViewerProps {
   files: FileData[];
   isGenerating: boolean;
 }
-
-const API_BASE_URL = 'http://localhost:5000/api';
 
 const ProjectViewer: React.FC<ProjectViewerProps> = ({ files, isGenerating }) => {
   const [selectedFile, setSelectedFile] = useState<FileData | null>(null);
@@ -30,7 +43,7 @@ const ProjectViewer: React.FC<ProjectViewerProps> = ({ files, isGenerating }) =>
   const [isSaving, setIsSaving] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['']));
 
-  // Organize files into a tree structure
+  // 🗂️ Organize files into a tree structure
   const fileTree = React.useMemo(() => {
     const tree: { [key: string]: FileData[] } = { '': [] };
     
@@ -40,9 +53,7 @@ const ProjectViewer: React.FC<ProjectViewerProps> = ({ files, isGenerating }) =>
         tree[''].push(file);
       } else {
         const folder = parts.slice(0, -1).join('/');
-        if (!tree[folder]) {
-          tree[folder] = [];
-        }
+        if (!tree[folder]) tree[folder] = [];
         tree[folder].push(file);
       }
     });
@@ -122,25 +133,21 @@ const ProjectViewer: React.FC<ProjectViewerProps> = ({ files, isGenerating }) =>
   };
 
   const handlePreview = () => {
-    // Open the entire project preview, not just one file
-    const previewUrl = 'http://localhost:5000/preview/';
+    // ✅ Use dynamic preview base URL
+    const previewUrl = PREVIEW_BASE_URL || `${API_BASE_URL?.replace('/api', '')}/preview`;
     window.open(previewUrl, '_blank');
   };
 
   const handlePreviewFile = () => {
-    // Preview a specific file (for non-HTML files or specific file preview)
     if (!selectedFile) return;
-    const previewUrl = `http://localhost:5000/preview/${selectedFile.path}`;
+    const previewUrl = `${PREVIEW_BASE_URL || `${API_BASE_URL?.replace('/api', '')}/preview`}/${selectedFile.path}`;
     window.open(previewUrl, '_blank');
   };
 
   const toggleFolder = (folder: string) => {
     const newExpanded = new Set(expandedFolders);
-    if (newExpanded.has(folder)) {
-      newExpanded.delete(folder);
-    } else {
-      newExpanded.add(folder);
-    }
+    if (newExpanded.has(folder)) newExpanded.delete(folder);
+    else newExpanded.add(folder);
     setExpandedFolders(newExpanded);
   };
 
@@ -268,7 +275,7 @@ const ProjectViewer: React.FC<ProjectViewerProps> = ({ files, isGenerating }) =>
                 {(selectedFile.name.endsWith('.html') || 
                   selectedFile.name.endsWith('.htm')) && (
                   <button
-                    onClick={handlePreview}
+                    onClick={handlePreviewFile}
                     className="action-button"
                     title="Preview in browser"
                   >

@@ -3,6 +3,22 @@ import axios from 'axios';
 import { Send, Loader2 } from 'lucide-react';
 import { FileData, GenerationStatus } from '../types';
 import './PromptInput.css';
+// ✅ Environment-aware base URLs
+const isLocalhost = window.location.hostname.includes('localhost');
+
+// Priority:
+// 1️⃣ Environment variables (from .env)
+// 2️⃣ Auto-detect: localhost → dev, else → production
+const baseURL =
+  process.env.REACT_APP_API_BASE_URL ||
+  (isLocalhost
+    ? 'http://localhost:5000'
+    : 'https://generate-awesome-backend.onrender.com');
+
+const API_BASE_URL = `${baseURL}/api`;
+const PREVIEW_BASE_URL =
+  process.env.REACT_APP_PREVIEW_BASE_URL || `${baseURL}/preview`;
+
 
 interface PromptInputProps {
   onGenerationStart: (requestId: string) => void;
@@ -11,9 +27,6 @@ interface PromptInputProps {
   isGenerating: boolean;
   requestId: string | null;
 }
-
-const API_BASE_URL = 'http://localhost:5000/api';
-
 const PromptInput: React.FC<PromptInputProps> = ({
   onGenerationStart,
   onGenerationComplete,
