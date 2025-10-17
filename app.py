@@ -17,6 +17,9 @@ CORS(app)  # Enable CORS for React frontend
 generation_status = {}
 generation_lock = threading.Lock()
 
+@app.route("/", methods=["GET"])
+def home():
+    return "Server is running ✅"
 # ------------------- CORE LOGIC ------------------- #
 
 def run_agent(prompt, request_id):
