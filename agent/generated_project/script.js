@@ -1,48 +1,114 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-    const mainNav = document.getElementById('main-nav');
+const numberButtons = document.querySelectorAll('[data-number]');
+const operatorButtons = document.querySelectorAll('[data-operator]');
+const equalsButton = document.querySelector('[data-equals]');
+const clearButton = document.querySelector('[data-clear]');
+const previousOperandTextElement = document.querySelector('.previous-operand');
+const currentOperandTextElement = document.querySelector('.current-operand');
 
-    // Function to toggle the mobile navigation menu
-    const toggleMobileMenu = () => {
-        if (mainNav) {
-            mainNav.classList.toggle('nav-open');
-        }
-    };
-
-    if (mobileMenuToggle) {
-        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+class Calculator {
+    constructor(previousOperandTextElement, currentOperandTextElement) {
+        this.previousOperandTextElement = previousOperandTextElement;
+        this.currentOperandTextElement = currentOperandTextElement;
+        this.clear();
     }
 
-    // Function to handle scroll animations - this is the IntersectionObserver callback
-    const animateOnScroll = (entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Add a CSS class (e.g., 'fade-in' or 'slide-up')
-                // 'is-visible' will trigger the animation defined in CSS
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target); // Stop observing once it's visible
-            }
-        });
-    };
+    clear() {
+        this.currentOperand = '';
+        this.previousOperand = '';
+        this.operation = undefined;
+    }
 
-    // Function to initialize scroll animations
-    const initializeScrollAnimations = () => {
-        const observerOptions = {
-            root: null, // viewport
-            rootMargin: '0px',
-            threshold: 0.1 // Trigger when 10% of the element is visible
-        };
+    appendNumber(number) {
+        if (number === '.' && this.currentOperand.includes('.')) return;
+        this.currentOperand = this.currentOperand.toString() + number.toString();
+    }
 
-        const observer = new IntersectionObserver(animateOnScroll, observerOptions);
+    chooseOperation(operation) {
+        if (this.currentOperand === '') return;
+        if (this.previousOperand !== '') {
+            this.compute();
+        }
+        this.operation = operation;
+        this.previousOperand = this.currentOperand;
+        this.currentOperand = '';
+    }
 
-        // Select all elements intended for animation
-        const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
+    compute() {
+        let computation;
+        const prev = parseFloat(this.previousOperand);
+        const current = parseFloat(this.currentOperand);
+        if (isNaN(prev) || isNaN(current)) return;
+        switch (this.operation) {
+            case '+':
+                computation = prev + current;
+                break;
+            case '-':
+                computation = prev - current;
+                break;
+            case '*':
+                computation = prev * current;
+                break;
+            case '÷':
+                computation = prev / current;
+                break;
+            default:
+                return;
+        }
+        this.currentOperand = computation;
+        this.operation = undefined;
+        this.previousOperand = '';
+    }
 
-        elementsToAnimate.forEach(element => {
-            observer.observe(element);
-        });
-    };
+    getDisplayNumber(number) {
+        const stringNumber = number.toString();
+        const integerDigits = parseFloat(stringNumber.split('.')[0]);
+        const decimalDigits = stringNumber.split('.')[1];
+        let integerDisplay;
+        if (isNaN(integerDigits)) {
+            integerDisplay = '';
+        } else {
+            integerDisplay = integerDigits.toLocaleString('en', { maximumFractionDigits: 0 });
+        }
+        if (decimalDigits != null) {
+            return `${integerDisplay}.${decimalDigits}`;
+        } else {
+            return integerDisplay;
+        }
+    }
 
-    // Call the animation initialization function when the DOM is loaded
-    initializeScrollAnimations();
+    updateDisplay() {
+        this.currentOperandTextElement.textContent = this.getDisplayNumber(this.currentOperand);
+        if (this.operation != null) {
+            this.previousOperandTextElement.textContent =
+                `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
+        } else {
+            this.previousOperandTextElement.textContent = '';
+        }
+    }
+}
+
+const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement);
+
+numberButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        calculator.appendNumber(button.textContent);
+        calculator.updateDisplay();
+    });
+});
+
+operatorButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        calculator.chooseOperation(button.textContent);
+        calculator.updateDisplay();
+    });
+});
+
+equalsButton.addEventListener('click', button => {
+    calculator.compute();
+    calculator.updateDisplay();
+});
+
+clearButton.addEventListener('click', button => {
+    calculator.clear();
+    calculator.updateDisplay();
 });

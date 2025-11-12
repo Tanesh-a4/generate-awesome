@@ -1,138 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-learning Homepage</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Calculator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav id="main-nav">
-            <a href="#" class="logo">E-Learning Platform</a>
-            <ul class="nav-links">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Courses</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Contact</a></li>
-                <li><a href="#">Login/Signup</a></li>
-            </ul>
-            <button id="mobile-menu-toggle">
-                <!-- Placeholder for mobile menu icon, e.g., three horizontal lines -->
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </nav>
-    </header>
-    <section id="hero-section">
-        <div class="hero-content">
-            <h1>Learn New Skills Online</h1>
-            <p>Explore a variety of courses taught by expert instructors.</p>
-            <button id="cta-button">Browse Courses</button>
-        </div>
-    </section>
-
-    <section class="course-categories-section">
-        <h2>Course Categories</h2>
-        <div class="course-cards-container">
-            <div class="course-card">
-                <img src="https://via.placeholder.com/100" alt="Technology Icon">
-                <h3>Technology</h3>
-                <p>Explore programming, AI, and cybersecurity.</p>
-            </div>
-            <div class="course-card">
-                <img src="https://via.placeholder.com/100" alt="Business Icon">
-                <h3>Business</h3>
-                <p>Learn about entrepreneurship, finance, and management.</p>
-            </div>
-            <div class="course-card">
-                <img src="https://via.placeholder.com/100" alt="Arts & Design Icon">
-                <h3>Arts & Design</h3>
-                <p>Unleash your creativity with graphic design and photography.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="courses-features-section">
-        <h2>Popular Courses</h2>
-        <div class="grid-container">
-            <div class="course-card">
-                <img src="https://via.placeholder.com/300x200" alt="Course Image">
-                <h3>Web Development Fundamentals</h3>
-                <p>Learn the basics of HTML, CSS, and JavaScript to build your first websites.</p>
-            </div>
-            <div class="course-card">
-                <img src="https://via.placeholder.com/300x200" alt="Course Image">
-                <h3>Data Science with Python</h3>
-                <p>Dive into data analysis, visualization, and machine learning using Python.</p>
-            </div>
-            <div class="course-card">
-                <img src="https://via.placeholder.com/300x200" alt="Course Image">
-                <h3>Digital Marketing Strategy</h3>
-                <p>Master SEO, social media, and content marketing to boost your brand online.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="categories">
-        <div class="container">
-            <h3>Course Categories</h3>
-            <div class="category-grid">
-                <div class="category-card">
-                    <h4>Technology</h4>
-                    <p>Explore programming, AI, and cybersecurity.</p>
-                    <a href="#" class="btn-small">View Courses</a>
-                </div>
-                <div class="category-card">
-                    <h4>Business</h4>
-                    <p>Learn about entrepreneurship, finance, and management.</p>
-                    <a href="#" class="btn-small">View Courses</a>
-                </div>
-                <div class="category-card">
-                    <h4>Arts & Design</h4>
-                    <p>Unleash your creativity with graphic design and photography.</p>
-                    <a href="#" class="btn-small">View Courses</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="testimonials-section">
-        <h2>What Our Students Say</h2>
-        <div class="testimonials-container">
-            <div class="testimonial-card">
-                <img src="https://via.placeholder.com/50" alt="Author Avatar" class="author-avatar">
-                <p class="testimonial-quote">"This platform transformed my career! The courses are incredibly insightful and the instructors are top-notch. Highly recommend for anyone looking to upskill."</p>
-                <p class="testimonial-author">Jane Doe</p>
-            </div>
-            <div class="testimonial-card">
-                <img src="https://via.placeholder.com/50" alt="Author Avatar" class="author-avatar">
-                <p class="testimonial-quote">"I never thought learning online could be this engaging. The practical exercises and real-world projects helped me gain confidence in my new skills."</p>
-                <p class="testimonial-author">John Smith</p>
-            </div>
-        </div>
-    </section>
-
-    <footer class="site-footer">
-        <p>&copy; 2023 E-Learning Platform. All rights reserved.</p>
-        <div class="footer-links">
-            <h4>Quick Links</h4>
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Courses</a></li>
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-        </div>
-        <div class="social-media">
-            <h4>Follow Us</h4>
-            <a href="#"><img src="https://via.placeholder.com/24/0000FF/FFFFFF?text=FB" alt="Facebook"></a>
-            <a href="#"><img src="https://via.placeholder.com/24/0000FF/FFFFFF?text=TW" alt="Twitter"></a>
-            <a href="#"><img src="https://via.placeholder.com/24/0000FF/FFFFFF?text=IG" alt="Instagram"></a>
-        </div>
-    </footer>
-
-    <script src="script.js" defer></script>
+  <div class="calculator-grid">
+    <div class="output">
+      <div class="previous-operand"></div>
+      <div class="current-operand"></div>
+    </div>
+    <button data-clear>AC</button>
+    <button data-operator>/</button>
+    <button data-operator>*</button>
+    <button data-operator>-</button>
+    <button data-number>7</button>
+    <button data-number>8</button>
+    <button data-number>9</button>
+    <button data-operator>+</button>
+    <button data-number>4</button>
+    <button data-number>5</button>
+    <button data-number>6</button>
+    <button data-number>1</button>
+    <button data-number>2</button>
+    <button data-number>3</button>
+    <button data-number>0</button>
+    <button data-number>.</button>
+    <button data-equals>=</button>
+  </div>
+  <script src="script.js" defer></script>
 </body>
 </html>

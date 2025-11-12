@@ -28,18 +28,40 @@ def run_agent(prompt, request_id):
         with generation_lock:
             generation_status[request_id] = {
                 "status": "processing",
-                "message": "Generating project...",
+                "message": "Analyzing your requirements...",
                 "result": None,
                 "error": None
             }
 
+        # Update status for planning phase
+        with generation_lock:
+            generation_status[request_id]["message"] = "Planning project structure..."
+
         result = agent.invoke({"user_prompt": prompt}, {"recursion_limit": 100})
+
+        # Update status for completion
+        with generation_lock:
+            generation_status[request_id]["message"] = "Finalizing project files..."
+
+        # Convert result to JSON-serializable format
+        serializable_result = None
+        if result:
+            try:
+                # Only keep basic information, not complex objects
+                serializable_result = {
+                    "status": result.get("status", "completed"),
+                    "user_prompt": result.get("user_prompt", ""),
+                    "message": "Project generated successfully"
+                }
+            except Exception as e:
+                print(f"Warning: Could not serialize result: {e}")
+                serializable_result = {"message": "Project generated successfully"}
 
         with generation_lock:
             generation_status[request_id] = {
                 "status": "completed",
                 "message": "Project generated successfully!",
-                "result": result,
+                "result": serializable_result,
                 "error": None
             }
     except Exception as e:
@@ -85,7 +107,18 @@ def get_status(request_id):
     if not status:
         return jsonify({"error": "Request not found"}), 404
 
-    return jsonify(status)
+    # Ensure response is JSON serializable
+    safe_status = {
+        "status": status.get("status", "unknown"),
+        "message": status.get("message", ""),
+        "error": status.get("error", None)
+    }
+    
+    # Only include result if it's serializable
+    if status.get("result") and isinstance(status["result"], dict):
+        safe_status["result"] = status["result"]
+
+    return jsonify(safe_status)
 
 
 @app.route('/api/files', methods=['GET'])
